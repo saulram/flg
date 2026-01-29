@@ -86,7 +86,7 @@ void main() {
       );
       expect(
         FileUtils.fileExistsSync(
-          '$projectPath/lib/features/auth/presentation/providers/auth_notifier.dart',
+          '$projectPath/lib/features/auth/presentation/providers/auth_provider.dart',
         ),
         isTrue,
       );

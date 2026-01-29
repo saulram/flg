@@ -235,8 +235,8 @@ my_app/
 │               ├── widgets/
 │               │   └── home_card.dart
 │               └── providers/
-│                   ├── home_notifier.dart
-│                   ├── home_notifier.g.dart
+│                   ├── home_provider.dart
+│                   ├── home_provider.g.dart
 │                   ├── home_state.dart
 │                   └── home_state.freezed.dart
 ├── test/
@@ -256,10 +256,10 @@ Uses modern `riverpod_annotation` with code generation:
 ```dart
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'home_notifier.g.dart';
+part 'home_provider.g.dart';
 
 @riverpod
-class HomeNotifier extends _$HomeNotifier {
+class Home extends _$Home {
   @override
   HomeState build() => const HomeState();
 
@@ -279,6 +279,8 @@ class HomeNotifier extends _$HomeNotifier {
   }
 }
 ```
+
+This generates a provider named `homeProvider` (not `homeNotifierProvider`).
 
 State classes use Freezed with `sealed class`:
 
@@ -454,6 +456,54 @@ flg uses absolute package imports (`package:my_app/...`). If you rename your pro
 
 - Dart SDK: ^3.0.0
 - Flutter (for generated projects): ^3.0.0
+
+## AI Assistant Integration
+
+flg integrates with AI assistants like [Claude Code](https://docs.anthropic.com/en/docs/build-with-claude/claude-code) for enhanced productivity.
+
+### Claude Code Skill
+
+When working in a project with flg installed, the `/flg` skill is available for quick command reference. The skill documentation is in `.claude/skills/flg/SKILL.md`.
+
+### MCP Server
+
+flg provides an MCP (Model Context Protocol) server for deeper AI assistant integration. This exposes flg functionality as tools that AI assistants can call directly.
+
+#### Configuration
+
+Add to your Claude Code MCP configuration (`~/.claude.json` or project settings):
+
+```json
+{
+  "mcpServers": {
+    "flg": {
+      "command": "dart",
+      "args": ["run", "flg:flg_mcp"]
+    }
+  }
+}
+```
+
+Or configure via CLI:
+
+```bash
+claude mcp add --scope user flg -- dart run flg:flg_mcp
+```
+
+#### Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `flg_generate_feature` | Generate a complete feature module |
+| `flg_generate_screen` | Generate a screen widget |
+| `flg_generate_widget` | Generate a widget |
+| `flg_generate_provider` | Generate provider/notifier/bloc |
+| `flg_generate_usecase` | Generate use cases |
+| `flg_generate_repository` | Generate repository |
+| `flg_setup` | Setup flg in existing project |
+| `flg_info` | Show project configuration |
+
+Each tool accepts a `path` parameter to specify the Flutter project directory (defaults to current directory).
 
 ## Contributing
 

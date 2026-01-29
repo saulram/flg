@@ -130,7 +130,7 @@ void main() {
     });
 
     group('NotifierTemplate', () {
-      test('generates Riverpod notifier', () {
+      test('generates Riverpod provider', () {
         final config = FcliConfig(
           projectName: 'app',
           stateManagement: StateManagement.riverpod,
@@ -138,9 +138,9 @@ void main() {
         final code = NotifierTemplate.generate('user', config);
 
         expect(code, contains("import 'package:riverpod_annotation/riverpod_annotation.dart'"));
-        expect(code, contains("part 'user_notifier.g.dart'"));
+        expect(code, contains("part 'user_provider.g.dart'"));
         expect(code, contains('@riverpod'));
-        expect(code, contains(r'class UserNotifier extends _$UserNotifier'));
+        expect(code, contains(r'class User extends _$User'));
         expect(code, contains('Future<void> loadAll()'));
         expect(code, contains('Future<void> loadById(String id)'));
         expect(code, contains('Future<void> create(UserEntity entity)'));

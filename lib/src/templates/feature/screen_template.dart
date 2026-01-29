@@ -59,7 +59,7 @@ class ScreenTemplate {
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:$projectName/features/$snakeFeature/presentation/providers/${snakeFeature}_notifier.dart';
+import 'package:$projectName/features/$snakeFeature/presentation/providers/${snakeFeature}_provider.dart';
 import 'package:$projectName/features/$snakeFeature/presentation/providers/${snakeFeature}_state.dart';
 
 /// Screen for $titleScreen.
@@ -76,13 +76,13 @@ class _${pascalScreen}ScreenState extends ConsumerState<${pascalScreen}Screen> {
     super.initState();
     // Load data when screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(${StringUtils.toCamelCase(pascalFeature)}NotifierProvider.notifier).loadAll();
+      ref.read(${StringUtils.toCamelCase(pascalFeature)}Provider.notifier).loadAll();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(${StringUtils.toCamelCase(pascalFeature)}NotifierProvider);
+    final state = ref.watch(${StringUtils.toCamelCase(pascalFeature)}Provider);
 
     return Scaffold(
       appBar: AppBar(
@@ -111,7 +111,7 @@ class _${pascalScreen}ScreenState extends ConsumerState<${pascalScreen}Screen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                ref.read(${StringUtils.toCamelCase(pascalFeature)}NotifierProvider.notifier).loadAll();
+                ref.read(${StringUtils.toCamelCase(pascalFeature)}Provider.notifier).loadAll();
               },
               child: const Text('Retry'),
             ),

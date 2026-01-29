@@ -193,7 +193,7 @@ class FeatureGenerator {
 
   String _getProviderFileName(String snakeName) {
     if (config.usesRiverpod) {
-      return '${snakeName}_notifier.dart';
+      return '${snakeName}_provider.dart';
     } else if (config.usesBloc) {
       return '${snakeName}_bloc.dart';
     } else {

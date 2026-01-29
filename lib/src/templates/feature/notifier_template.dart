@@ -45,11 +45,11 @@ import 'package:$projectName/features/$featureSnake/domain/entities/${snakeName}
 import 'package:$projectName/features/$featureSnake/domain/repositories/${snakeName}_repository.dart';
 import 'package:$projectName/features/$featureSnake/presentation/providers/${snakeName}_state.dart';
 
-part '${snakeName}_notifier.g.dart';
+part '${snakeName}_provider.g.dart';
 
-/// Notifier for managing $pascalName state.
+/// Provider for managing $pascalName state.
 @riverpod
-class ${pascalName}Notifier extends _\$${pascalName}Notifier {
+class $pascalName extends _\$$pascalName {
   ${pascalName}Repository? _repository;
 
   @override
