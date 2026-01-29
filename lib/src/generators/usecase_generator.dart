@@ -89,6 +89,7 @@ class UseCaseGenerator {
     final content = UseCaseFeatureTemplate.generate(
       featureName,
       action,
+      config,
       entityName: entityName,
       paramsType: paramsType,
       paramsFields: paramsFields,
@@ -135,6 +136,7 @@ class UseCaseGenerator {
 
     final usecases = UseCaseFeatureTemplate.generateCommonUseCases(
       featureName,
+      config,
       entityName: entityName,
     );
 

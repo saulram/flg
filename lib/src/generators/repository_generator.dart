@@ -88,7 +88,7 @@ class RepositoryGenerator {
     final abstractPath = p.join(domainPath, '${snakeRepo}_repository.dart');
     await FileUtils.writeFile(
       abstractPath,
-      RepositoryAbstractTemplate.generate(repositoryName),
+      RepositoryAbstractTemplate.generate(repositoryName, config),
     );
     ConsoleUtils.success('Repository interface created: $abstractPath');
 
@@ -96,7 +96,7 @@ class RepositoryGenerator {
     final implPath = p.join(dataPath, '${snakeRepo}_repository_impl.dart');
     await FileUtils.writeFile(
       implPath,
-      RepositoryImplTemplate.generate(repositoryName),
+      RepositoryImplTemplate.generate(repositoryName, config),
     );
     ConsoleUtils.success('Repository implementation created: $implPath');
 
@@ -149,7 +149,7 @@ class RepositoryGenerator {
 
     await FileUtils.writeFile(
       datasourcePath,
-      DataSourceTemplate.generateLocal(name),
+      DataSourceTemplate.generateLocal(featureName, config, entityName: name),
     );
 
     ConsoleUtils.success('Local data source created: $datasourcePath');

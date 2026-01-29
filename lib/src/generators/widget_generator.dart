@@ -72,7 +72,7 @@ class WidgetGenerator {
     }
 
     // Generate widget content
-    final content = _generateContent(widgetName, type);
+    final content = _generateContent(widgetName, featureName, type);
 
     await FileUtils.writeFile(widgetPath, content);
 
@@ -93,18 +93,18 @@ class WidgetGenerator {
     }
   }
 
-  String _generateContent(String widgetName, WidgetType type) {
+  String _generateContent(String widgetName, String featureName, WidgetType type) {
     switch (type) {
       case WidgetType.stateless:
         return WidgetTemplate.generateStateless(widgetName);
       case WidgetType.stateful:
         return WidgetTemplate.generateStateful(widgetName);
       case WidgetType.entityCard:
-        return WidgetTemplate.generateEntityCard(widgetName);
+        return WidgetTemplate.generateEntityCard(featureName, config, entityName: widgetName);
       case WidgetType.entityListTile:
-        return WidgetTemplate.generateEntityListTile(widgetName);
+        return WidgetTemplate.generateEntityListTile(featureName, config, entityName: widgetName);
       case WidgetType.entityForm:
-        return WidgetTemplate.generateEntityForm(widgetName);
+        return WidgetTemplate.generateEntityForm(featureName, config, entityName: widgetName);
     }
   }
 

@@ -116,7 +116,7 @@ class FeatureGenerator {
     // Repository interface
     await FileUtils.writeFile(
       p.join(featurePath, 'domain', 'repositories', '${snakeName}_repository.dart'),
-      RepositoryAbstractTemplate.generate(featureName),
+      RepositoryAbstractTemplate.generate(featureName, config),
     );
   }
 
@@ -135,7 +135,7 @@ class FeatureGenerator {
     // Repository implementation
     await FileUtils.writeFile(
       p.join(featurePath, 'data', 'repositories', '${snakeName}_repository_impl.dart'),
-      RepositoryImplTemplate.generate(featureName),
+      RepositoryImplTemplate.generate(featureName, config),
     );
 
     // Remote data source
@@ -168,7 +168,7 @@ class FeatureGenerator {
     if (config.usesRiverpod) {
       await FileUtils.writeFile(
         p.join(featurePath, 'presentation', 'providers', '${snakeName}_state.dart'),
-        NotifierTemplate.generateState(featureName),
+        NotifierTemplate.generateState(featureName, config),
       );
     }
 
@@ -187,7 +187,7 @@ class FeatureGenerator {
     // Entity card widget
     await FileUtils.writeFile(
       p.join(featurePath, 'presentation', 'widgets', '${snakeName}_card.dart'),
-      WidgetTemplate.generateEntityCard(featureName),
+      WidgetTemplate.generateEntityCard(featureName, config),
     );
   }
 

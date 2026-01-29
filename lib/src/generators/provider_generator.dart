@@ -96,7 +96,7 @@ class ProviderGenerator {
     final statePath = p.join(providersPath, '${snakeProvider}_state.dart');
     await FileUtils.writeFile(
       statePath,
-      NotifierTemplate.generateState(providerName),
+      NotifierTemplate.generateState(providerName, config),
     );
     ConsoleUtils.success('State created: $statePath');
   }
