@@ -106,7 +106,6 @@ class UseCaseGenerator {
     String featureName, {
     String? entityName,
   }) async {
-    final entity = entityName ?? featureName;
     final snakeFeature = StringUtils.toSnakeCase(featureName);
     final usecasesPath = p.join(
       projectPath,

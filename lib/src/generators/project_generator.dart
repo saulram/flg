@@ -1,6 +1,5 @@
 import 'package:path/path.dart' as p;
 
-import '../config/config_loader.dart';
 import '../config/fcli_config.dart';
 import '../templates/config/fcli_json_template.dart';
 import '../templates/config/pubspec_template.dart';

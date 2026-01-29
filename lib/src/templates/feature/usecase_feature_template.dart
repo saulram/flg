@@ -27,16 +27,14 @@ class UseCaseFeatureTemplate {
     final snakeName = StringUtils.toSnakeCase(name);
     final featureSnake = StringUtils.toSnakeCase(featureName);
     final pascalAction = StringUtils.toPascalCase(action);
-    final camelAction = StringUtils.toCamelCase(action);
     final projectName = config.projectName;
 
     final useCaseName = '$pascalAction$pascalName';
-    final hasParams = paramsType != null;
     final effectiveReturnType = returnType ?? '${pascalName}Entity';
     final effectiveParamsType = paramsType ?? 'NoParams';
 
-    final paramsClass = hasParams
-        ? _generateParamsClass(useCaseName, paramsType!, paramsFields)
+    final paramsClass = paramsType != null
+        ? _generateParamsClass(useCaseName, paramsType, paramsFields)
         : '';
 
     final repoMethod = _getRepoMethod(action, pascalName);

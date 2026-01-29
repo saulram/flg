@@ -1,8 +1,19 @@
 name: fcli
-description: A CLI tool for generating Flutter projects with Clean Architecture feature-first structure.
+description: >-
+  A CLI tool for generating Flutter projects with Clean Architecture,
+  feature-first organization, and modern state management (Riverpod, Bloc, Provider).
 version: 1.0.0
-homepage: https://github.com/your-username/fcli
-repository: https://github.com/your-username/fcli
+homepage: https://github.com/saulram/fcli
+repository: https://github.com/saulram/fcli
+issue_tracker: https://github.com/saulram/fcli/issues
+documentation: https://github.com/saulram/fcli#readme
+
+topics:
+  - cli
+  - flutter
+  - clean-architecture
+  - code-generator
+  - scaffolding
 
 environment:
   sdk: ^3.0.0

@@ -1,60 +1,90 @@
-# fcli - Flutter Clean Architecture CLI
+# fcli
 
-A powerful CLI tool for generating Flutter projects with Clean Architecture, feature-first organization, and your choice of state management.
+[![Pub Version](https://img.shields.io/pub/v/fcli)](https://pub.dev/packages/fcli)
+[![Dart SDK](https://img.shields.io/badge/Dart-%5E3.0.0-blue)](https://dart.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://img.shields.io/badge/tests-81%20passed-brightgreen)](https://github.com/saulram/fcli)
+
+A powerful CLI tool for generating Flutter projects with **Clean Architecture**, feature-first organization, and your choice of modern state management.
+
+Inspired by Angular CLI, fcli eliminates boilerplate and enforces architectural consistency across your Flutter projects.
 
 ## Features
 
-- **Clean Architecture**: Generates a well-organized project structure with domain, data, and presentation layers
-- **Feature-First Organization**: Each feature is self-contained with all its layers
-- **Multiple State Management Options**: Riverpod (default), Bloc, or Provider
-- **Router Support**: GoRouter (default) or AutoRoute
-- **Freezed Integration**: Optional Freezed for immutable data classes
-- **Dio HTTP Client**: Built-in HTTP client setup
-- **Code Generation**: Automatic generation of entities, models, repositories, use cases, screens, and widgets
+| Feature | Description |
+|---------|-------------|
+| **Clean Architecture** | Domain, Data, and Presentation layers with clear separation of concerns |
+| **Feature-First** | Each feature is self-contained with all its layers |
+| **State Management** | Riverpod (default), Bloc, or Provider |
+| **Routing** | GoRouter (default) or AutoRoute with code generation |
+| **Freezed Integration** | Immutable data classes with `sealed class` syntax |
+| **Code Generation** | Automatic `build_runner` execution |
+| **Existing Projects** | Set up fcli in any existing Flutter project |
 
-## Installation
+## Quick Start
+
+### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/fcli.git
+# From pub.dev (recommended)
+dart pub global activate fcli
+
+# Or from source
+git clone https://github.com/saulram/fcli.git
 cd fcli
-
-# Install dependencies
-dart pub get
-
-# Activate globally
 dart pub global activate --source path .
 ```
 
-Or compile to an executable:
+### Create a New Project
 
 ```bash
-dart compile exe bin/fcli.dart -o fcli
-./fcli --help
-```
-
-## Usage
-
-### Initialize a New Project
-
-```bash
-# Interactive mode (recommended)
+# Interactive mode (recommended for first-time users)
 fcli init my_app
 
-# With options
-fcli init my_app --org com.mycompany --state riverpod --router go_router
-
-# Skip prompts and use defaults
+# Non-interactive with defaults
 fcli init my_app -s
+
+# With specific options
+fcli init my_app --state riverpod --router go_router --org com.mycompany
 ```
 
-#### Init Options
+### Set Up an Existing Project
+
+```bash
+cd my_existing_flutter_app
+fcli setup
+```
+
+### Generate Components
+
+```bash
+# Generate a feature
+fcli g f auth
+
+# Generate a screen
+fcli g s login -f auth
+
+# Generate a widget
+fcli g w user_avatar -f auth
+
+# Generate CRUD use cases
+fcli g u user -f user --crud
+
+# Generate a repository
+fcli g r user -f user
+```
+
+## Commands
+
+### `fcli init <project_name>`
+
+Creates a new Flutter project with Clean Architecture.
 
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
-| `--org` | `-o` | Organization identifier | `com.example` |
-| `--state` | | State management (riverpod, bloc, provider) | `riverpod` |
-| `--router` | | Router (go_router, auto_route) | `go_router` |
+| `--org` | `-o` | Organization identifier (reverse domain) | `com.example` |
+| `--state` | | State management: `riverpod`, `bloc`, `provider` | `riverpod` |
+| `--router` | | Router: `go_router`, `auto_route` | `go_router` |
 | `--freezed` | | Use Freezed for data classes | `true` |
 | `--dio` | | Use Dio HTTP client | `true` |
 | `--platforms` | `-p` | Target platforms | `android,ios` |
@@ -63,67 +93,57 @@ fcli init my_app -s
 | `--dry-run` | | Preview without creating files | `false` |
 | `--verbose` | `-v` | Show detailed output | `false` |
 
-### Generate Components
+### `fcli setup`
 
-All generate commands use the `generate` (or `g`) command:
+Configures fcli in an existing Flutter project.
 
-```bash
-# Generate a new feature
-fcli g feature auth
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--state` | | State management solution | `riverpod` |
+| `--router` | | Router solution | `go_router` |
+| `--freezed` | | Use Freezed | `true` |
+| `--dio` | | Use Dio | `true` |
+| `--feature` | | Initial feature name | (none) |
+| `--skip-deps` | | Don't modify pubspec.yaml | `false` |
+| `--skip-prompts` | `-s` | Skip interactive prompts | `false` |
+| `--force` | `-f` | Reconfigure if fcli.json exists | `false` |
+| `--dry-run` | | Preview without making changes | `false` |
 
-# Generate a screen
-fcli g screen login -f auth
+### `fcli generate <component>` (alias: `g`)
 
-# Generate a widget
-fcli g widget user_avatar -f auth -t stateless
+Generates code components within an fcli project.
 
-# Generate a provider/notifier/bloc
-fcli g provider auth -f auth
+| Subcommand | Alias | Description |
+|------------|-------|-------------|
+| `feature` | `f` | Complete feature module with all layers |
+| `screen` | `s` | Screen widget with routing setup |
+| `widget` | `w` | Widget (stateless, stateful, card, list_tile, form) |
+| `provider` | `p` | Provider/Notifier/Bloc based on state management |
+| `usecase` | `u` | Use case (single action or CRUD) |
+| `repository` | `r` | Repository interface and implementation |
 
-# Generate a use case
-fcli g usecase login -f auth -a create
-
-# Generate all CRUD use cases
-fcli g usecase user -f user --crud
-
-# Generate a repository
-fcli g repository user -f user
-```
-
-#### Generate Subcommands
-
-| Command | Alias | Description |
-|---------|-------|-------------|
-| `feature` | `f` | Generate a complete feature module |
-| `screen` | `s` | Generate a screen widget |
-| `widget` | `w` | Generate a widget |
-| `provider` | `p` | Generate a provider/notifier/bloc |
-| `usecase` | `u` | Generate a use case |
-| `repository` | `r` | Generate a repository |
-
-### Examples
+#### Examples
 
 ```bash
-# Create a new project with Bloc
-fcli init todo_app --state bloc --router go_router
+# Feature with custom entity
+fcli g f product --entity product_item
 
-# Add a task feature
-cd todo_app
-fcli g feature task
+# Stateful widget
+fcli g w product_form -f product -t stateful
 
-# Add a detail screen to task feature
-fcli g screen task_detail -f task
+# Form widget
+fcli g w checkout_form -f checkout -t form
 
-# Add a form widget
-fcli g widget task_form -f task -t form
+# Single use case
+fcli g u authenticate -f auth -a create
 
-# Generate CRUD use cases
-fcli g usecase task -f task --crud
+# All CRUD use cases at once
+fcli g u product -f product --crud
 ```
 
 ## Project Structure
 
-After running `fcli init my_app`, you'll get:
+After running `fcli init my_app`, you get:
 
 ```
 my_app/
@@ -135,8 +155,10 @@ my_app/
 │   │   │   └── failures.dart
 │   │   ├── usecases/
 │   │   │   └── usecase.dart
-│   │   └── router/
-│   │       └── app_router.dart
+│   │   ├── router/
+│   │   │   └── app_router.dart
+│   │   ├── network/
+│   │   └── utils/
 │   └── features/
 │       └── home/
 │           ├── domain/
@@ -159,15 +181,123 @@ my_app/
 │               │   └── home_card.dart
 │               └── providers/
 │                   ├── home_notifier.dart
-│                   └── home_state.dart
+│                   ├── home_notifier.g.dart
+│                   ├── home_state.dart
+│                   └── home_state.freezed.dart
 ├── test/
+│   ├── unit/
+│   ├── integration/
+│   └── fixtures/
 ├── pubspec.yaml
 └── fcli.json
 ```
 
+## State Management
+
+### Riverpod (Default)
+
+Uses modern `riverpod_annotation` with code generation:
+
+```dart
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'home_notifier.g.dart';
+
+@riverpod
+class HomeNotifier extends _$HomeNotifier {
+  @override
+  HomeState build() => const HomeState();
+
+  Future<void> loadAll() async {
+    state = state.copyWith(isLoading: true);
+    final result = await _repository.getAll();
+    result.fold(
+      (failure) => state = state.copyWith(
+        isLoading: false,
+        errorMessage: failure.message,
+      ),
+      (items) => state = state.copyWith(
+        isLoading: false,
+        homes: items,
+      ),
+    );
+  }
+}
+```
+
+State classes use Freezed with `sealed class`:
+
+```dart
+@freezed
+sealed class HomeState with _$HomeState {
+  const factory HomeState({
+    @Default([]) List<HomeEntity> homes,
+    HomeEntity? selectedHome,
+    @Default(false) bool isLoading,
+    String? errorMessage,
+  }) = _HomeState;
+
+  const HomeState._();
+
+  bool get hasError => errorMessage != null;
+  bool get isEmpty => homes.isEmpty;
+}
+```
+
+### Bloc
+
+Full Bloc pattern with events and states:
+
+```dart
+class HomeBloc extends Bloc<HomeEvent, HomeState> {
+  HomeBloc(this._repository) : super(const HomeInitial()) {
+    on<LoadHomesEvent>(_onLoadHomes);
+  }
+
+  final HomeRepository _repository;
+
+  Future<void> _onLoadHomes(LoadHomesEvent event, Emitter<HomeState> emit) async {
+    emit(const HomeLoading());
+    final result = await _repository.getAll();
+    result.fold(
+      (failure) => emit(HomeError(failure.message)),
+      (homes) => emit(HomeLoaded(homes)),
+    );
+  }
+}
+```
+
+### Provider
+
+Simple ChangeNotifier pattern:
+
+```dart
+class HomeProvider extends ChangeNotifier {
+  final HomeRepository _repository;
+
+  List<HomeEntity> _homes = [];
+  bool _isLoading = false;
+  String? _error;
+
+  Future<void> loadAll() async {
+    _isLoading = true;
+    notifyListeners();
+
+    final result = await _repository.getAll();
+    result.fold(
+      (failure) => _error = failure.message,
+      (homes) => _homes = homes,
+    );
+
+    _isLoading = false;
+    notifyListeners();
+  }
+}
+```
+
 ## Configuration
 
-The `fcli.json` file stores your project configuration:
+The `fcli.json` file stores project configuration:
 
 ```json
 {
@@ -184,64 +314,108 @@ The `fcli.json` file stores your project configuration:
 }
 ```
 
-## State Management
+This file is automatically created during `init` or `setup` and is used by generate commands to maintain consistency.
 
-### Riverpod (Default)
+## Architecture Overview
 
-Generates `StateNotifier` with `StateNotifierProvider`:
+fcli generates code following Clean Architecture principles:
 
-```dart
-final homeNotifierProvider =
-    StateNotifierProvider<HomeNotifier, HomeState>((ref) {
-  // ...
-});
-
-class HomeNotifier extends StateNotifier<HomeState> {
-  // ...
-}
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Presentation Layer                    │
+│  ┌─────────┐  ┌──────────────┐  ┌───────────────────┐  │
+│  │ Screens │  │   Widgets    │  │ Providers/Blocs   │  │
+│  └─────────┘  └──────────────┘  └───────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                      Domain Layer                        │
+│  ┌──────────┐  ┌──────────────────┐  ┌──────────────┐  │
+│  │ Entities │  │ Repository Intf. │  │   UseCases   │  │
+│  └──────────┘  └──────────────────┘  └──────────────┘  │
+└─────────────────────────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────┐
+│                       Data Layer                         │
+│  ┌────────┐  ┌───────────────────┐  ┌───────────────┐  │
+│  │ Models │  │ Repository Impl.  │  │  DataSources  │  │
+│  └────────┘  └───────────────────┘  └───────────────┘  │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Bloc
+### Key Patterns
 
-Generates full Bloc pattern with events and states:
+- **Entities**: Pure Dart classes representing business objects
+- **Repositories**: Abstract interfaces in domain, implementations in data
+- **Use Cases**: Single-responsibility classes for business logic
+- **Models**: Data classes with JSON serialization (Freezed-based)
+- **DataSources**: Handle external data (API, database, cache)
 
-```dart
-class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  // ...
-}
+## Known Limitations
+
+### Current Limitations
+
+1. **No test file generation**: Test scaffolding is not yet implemented. The `test/` directory structure is created but test files are not generated.
+
+2. **No migration support**: Upgrading configuration after `setup` or `init` requires manual intervention.
+
+3. **Single datasource per feature**: Currently generates only remote datasources. Local caching datasources require manual implementation.
+
+4. **No DI container setup**: Dependency injection setup (get_it, injectable) is not included. Repository injection in notifiers requires manual wiring.
+
+### Planned Features
+
+- [ ] Test file generation with mocking
+- [ ] get_it / injectable integration
+- [ ] Local datasource templates (Hive, SQLite)
+- [ ] Migration command for config updates
+- [ ] Custom template support
+
+## Troubleshooting
+
+### `build_runner` fails
+
+If code generation fails after project creation:
+
+```bash
+# For Flutter projects
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Watch mode for development
+flutter pub run build_runner watch --delete-conflicting-outputs
 ```
 
-### Provider
+### Riverpod provider not found
 
-Generates `ChangeNotifier`:
+Ensure you've run `build_runner` after adding new providers. The `.g.dart` files must be generated.
 
-```dart
-class HomeProvider extends ChangeNotifier {
-  // ...
-}
-```
+### Import errors
 
-## After Project Creation
+fcli uses absolute package imports (`package:my_app/...`). If you rename your project, update the `name` field in `pubspec.yaml` and regenerate imports.
 
-1. Navigate to your project:
-   ```bash
-   cd my_app
-   ```
+## Requirements
 
-2. Run build_runner (if using Freezed):
-   ```bash
-   dart run build_runner build --delete-conflicting-outputs
-   ```
-
-3. Run the app:
-   ```bash
-   flutter run
-   ```
+- Dart SDK: ^3.0.0
+- Flutter (for generated projects): ^3.0.0
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please see the [GitHub repository](https://github.com/saulram/fcli) for:
+
+- [Issue Tracker](https://github.com/saulram/fcli/issues)
+- [Pull Requests](https://github.com/saulram/fcli/pulls)
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Credits
+
+Created by [Saul Ramirez](https://github.com/saulram)
+
+Inspired by:
+- [Angular CLI](https://angular.io/cli)
+- [Very Good CLI](https://github.com/VeryGoodOpenSource/very_good_cli)
+- [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)

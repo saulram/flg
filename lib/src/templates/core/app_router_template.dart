@@ -20,7 +20,6 @@ class AppRouterTemplate {
     final routes = StringBuffer();
 
     for (final feature in features) {
-      final pascal = StringUtils.toPascalCase(feature);
       final snake = StringUtils.toSnakeCase(feature);
       imports.writeln(
           "import 'package:$projectName/features/$snake/presentation/screens/${snake}_screen.dart';");
@@ -28,8 +27,8 @@ class AppRouterTemplate {
 
     for (var i = 0; i < features.length; i++) {
       final feature = features[i];
-      final pascal = StringUtils.toPascalCase(feature);
       final snake = StringUtils.toSnakeCase(feature);
+      final pascal = StringUtils.toPascalCase(feature);
       final isFirst = i == 0;
 
       routes.writeln('''
@@ -77,7 +76,6 @@ $routes
     final routes = StringBuffer();
 
     for (final feature in features) {
-      final pascal = StringUtils.toPascalCase(feature);
       final snake = StringUtils.toSnakeCase(feature);
       imports.writeln(
           "import 'package:$projectName/features/$snake/presentation/screens/${snake}_screen.dart';");
@@ -85,8 +83,8 @@ $routes
 
     for (var i = 0; i < features.length; i++) {
       final feature = features[i];
-      final pascal = StringUtils.toPascalCase(feature);
       final isFirst = i == 0;
+      final pascal = StringUtils.toPascalCase(feature);
 
       routes.writeln('''
     AutoRoute(

@@ -98,7 +98,6 @@ class InitCommand extends Command<int> {
     }
 
     final projectName = argResults!.rest.first;
-    final force = argResults!['force'] as bool;
     final dryRun = argResults!['dry-run'] as bool;
     final verbose = argResults!['verbose'] as bool;
     final skipPrompts = argResults!['skip-prompts'] as bool;
