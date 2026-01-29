@@ -85,7 +85,8 @@ void main() {
 
     group('RepositoryAbstractTemplate', () {
       test('generates valid repository interface', () {
-        final code = RepositoryAbstractTemplate.generate('user');
+        final config = FcliConfig(projectName: 'app');
+        final code = RepositoryAbstractTemplate.generate('user', config);
 
         expect(code, contains("import 'package:dartz/dartz.dart'"));
         expect(code, contains('abstract class UserRepository'));
@@ -136,9 +137,10 @@ void main() {
         );
         final code = NotifierTemplate.generate('user', config);
 
-        expect(code, contains("import 'package:flutter_riverpod/flutter_riverpod.dart'"));
-        expect(code, contains('StateNotifierProvider<UserNotifier, UserState>'));
-        expect(code, contains('class UserNotifier extends StateNotifier<UserState>'));
+        expect(code, contains("import 'package:riverpod_annotation/riverpod_annotation.dart'"));
+        expect(code, contains("part 'user_notifier.g.dart'"));
+        expect(code, contains('@riverpod'));
+        expect(code, contains(r'class UserNotifier extends _$UserNotifier'));
         expect(code, contains('Future<void> loadAll()'));
         expect(code, contains('Future<void> loadById(String id)'));
         expect(code, contains('Future<void> create(UserEntity entity)'));
@@ -176,15 +178,17 @@ void main() {
         expect(code, contains('notifyListeners()'));
       });
 
-      test('generateState creates valid state class', () {
-        final code = NotifierTemplate.generateState('user');
+      test('generateState creates valid state class with Freezed', () {
+        final config = FcliConfig(projectName: 'app');
+        final code = NotifierTemplate.generateState('user', config);
 
-        expect(code, contains("import 'package:equatable/equatable.dart'"));
-        expect(code, contains('enum UserStatus { initial, loading, loaded, error }'));
-        expect(code, contains('class UserState extends Equatable'));
-        expect(code, contains('bool get isLoading'));
+        expect(code, contains("import 'package:freezed_annotation/freezed_annotation.dart'"));
+        expect(code, contains("part 'user_state.freezed.dart'"));
+        expect(code, contains('@freezed'));
+        expect(code, contains(r'class UserState with _$UserState'));
+        expect(code, contains('@Default(false) bool isLoading'));
         expect(code, contains('bool get hasError'));
-        expect(code, contains('UserState copyWith'));
+        expect(code, contains('List<UserEntity> users'));
       });
     });
 
