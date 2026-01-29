@@ -81,7 +81,7 @@ class SetupCommand extends Command<int> {
 
   @override
   String get description =>
-      'Set up fcli in an existing Flutter project with Clean Architecture.';
+      'Set up flg in an existing Flutter project with Clean Architecture.';
 
   @override
   String get invocation => 'flg setup [options]';
