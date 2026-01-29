@@ -16,57 +16,67 @@ class NotifierTemplate {
     String? entityName,
   }) {
     final name = entityName ?? featureName;
+    final projectName = config.projectName;
+    final featureSnake = StringUtils.toSnakeCase(featureName);
 
     if (config.usesRiverpod) {
-      return _generateRiverpodNotifier(name);
+      return _generateRiverpodNotifier(name, projectName, featureSnake);
     } else if (config.usesBloc) {
-      return _generateBloc(name);
+      return _generateBloc(name, projectName, featureSnake);
     } else {
-      return _generateChangeNotifier(name);
+      return _generateChangeNotifier(name, projectName, featureSnake);
     }
   }
 
-  static String _generateRiverpodNotifier(String name) {
+  static String _generateRiverpodNotifier(
+    String name,
+    String projectName,
+    String featureSnake,
+  ) {
     final pascalName = StringUtils.toPascalCase(name);
     final snakeName = StringUtils.toSnakeCase(name);
     final camelName = StringUtils.toCamelCase(name);
     final pluralCamel = StringUtils.toPlural(camelName);
 
     return '''
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../domain/entities/${snakeName}_entity.dart';
-import '../../domain/repositories/${snakeName}_repository.dart';
-import '${snakeName}_state.dart';
+import 'package:$projectName/features/$featureSnake/domain/entities/${snakeName}_entity.dart';
+import 'package:$projectName/features/$featureSnake/domain/repositories/${snakeName}_repository.dart';
+import 'package:$projectName/features/$featureSnake/presentation/providers/${snakeName}_state.dart';
 
-/// Provider for ${pascalName}Notifier.
-final ${camelName}NotifierProvider =
-    StateNotifierProvider<${pascalName}Notifier, ${pascalName}State>((ref) {
-  throw UnimplementedError('Provider must be overridden with repository');
-});
+part '${snakeName}_notifier.g.dart';
 
-/// State notifier for managing $pascalName state.
-class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
-  ${pascalName}Notifier({
-    required ${pascalName}Repository repository,
-  })  : _repository = repository,
-        super(const ${pascalName}State.initial());
+/// Notifier for managing $pascalName state.
+@riverpod
+class ${pascalName}Notifier extends _\$${pascalName}Notifier {
+  ${pascalName}Repository? _repository;
 
-  final ${pascalName}Repository _repository;
+  @override
+  ${pascalName}State build() {
+    return const ${pascalName}State();
+  }
+
+  /// Sets the repository. Call this before using other methods.
+  void setRepository(${pascalName}Repository repository) {
+    _repository = repository;
+  }
 
   /// Loads all $pluralCamel.
   Future<void> loadAll() async {
-    state = state.copyWith(status: ${pascalName}Status.loading);
+    if (_repository == null) return;
 
-    final result = await _repository.getAll();
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    final result = await _repository!.getAll();
 
     result.fold(
       (failure) => state = state.copyWith(
-        status: ${pascalName}Status.error,
+        isLoading: false,
         errorMessage: failure.message,
       ),
       ($pluralCamel) => state = state.copyWith(
-        status: ${pascalName}Status.loaded,
+        isLoading: false,
         $pluralCamel: $pluralCamel,
       ),
     );
@@ -74,17 +84,19 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
 
   /// Loads a single $camelName by ID.
   Future<void> loadById(String id) async {
-    state = state.copyWith(status: ${pascalName}Status.loading);
+    if (_repository == null) return;
 
-    final result = await _repository.getById(id);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    final result = await _repository!.getById(id);
 
     result.fold(
       (failure) => state = state.copyWith(
-        status: ${pascalName}Status.error,
+        isLoading: false,
         errorMessage: failure.message,
       ),
       ($camelName) => state = state.copyWith(
-        status: ${pascalName}Status.loaded,
+        isLoading: false,
         selected$pascalName: $camelName,
       ),
     );
@@ -92,19 +104,21 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
 
   /// Creates a new $camelName.
   Future<void> create(${pascalName}Entity entity) async {
-    state = state.copyWith(status: ${pascalName}Status.loading);
+    if (_repository == null) return;
 
-    final result = await _repository.create(entity);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    final result = await _repository!.create(entity);
 
     result.fold(
       (failure) => state = state.copyWith(
-        status: ${pascalName}Status.error,
+        isLoading: false,
         errorMessage: failure.message,
       ),
       ($camelName) {
         final updated = [...state.$pluralCamel, $camelName];
         state = state.copyWith(
-          status: ${pascalName}Status.loaded,
+          isLoading: false,
           $pluralCamel: updated,
         );
       },
@@ -113,13 +127,15 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
 
   /// Updates an existing $camelName.
   Future<void> update(${pascalName}Entity entity) async {
-    state = state.copyWith(status: ${pascalName}Status.loading);
+    if (_repository == null) return;
 
-    final result = await _repository.update(entity);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    final result = await _repository!.update(entity);
 
     result.fold(
       (failure) => state = state.copyWith(
-        status: ${pascalName}Status.error,
+        isLoading: false,
         errorMessage: failure.message,
       ),
       ($camelName) {
@@ -127,7 +143,7 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
           return e.id == $camelName.id ? $camelName : e;
         }).toList();
         state = state.copyWith(
-          status: ${pascalName}Status.loaded,
+          isLoading: false,
           $pluralCamel: updated,
         );
       },
@@ -136,19 +152,21 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
 
   /// Deletes a $camelName by ID.
   Future<void> delete(String id) async {
-    state = state.copyWith(status: ${pascalName}Status.loading);
+    if (_repository == null) return;
 
-    final result = await _repository.delete(id);
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    final result = await _repository!.delete(id);
 
     result.fold(
       (failure) => state = state.copyWith(
-        status: ${pascalName}Status.error,
+        isLoading: false,
         errorMessage: failure.message,
       ),
       (_) {
         final updated = state.$pluralCamel.where((e) => e.id != id).toList();
         state = state.copyWith(
-          status: ${pascalName}Status.loaded,
+          isLoading: false,
           $pluralCamel: updated,
         );
       },
@@ -157,10 +175,7 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
 
   /// Clears any error state.
   void clearError() {
-    state = state.copyWith(
-      status: ${pascalName}Status.loaded,
-      errorMessage: null,
-    );
+    state = state.copyWith(errorMessage: null);
   }
 
   /// Selects a $camelName.
@@ -171,7 +186,11 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
 ''';
   }
 
-  static String _generateBloc(String name) {
+  static String _generateBloc(
+    String name,
+    String projectName,
+    String featureSnake,
+  ) {
     final pascalName = StringUtils.toPascalCase(name);
     final snakeName = StringUtils.toSnakeCase(name);
     final camelName = StringUtils.toCamelCase(name);
@@ -180,8 +199,8 @@ class ${pascalName}Notifier extends StateNotifier<${pascalName}State> {
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../domain/entities/${snakeName}_entity.dart';
-import '../../domain/repositories/${snakeName}_repository.dart';
+import 'package:$projectName/features/$featureSnake/domain/entities/${snakeName}_entity.dart';
+import 'package:$projectName/features/$featureSnake/domain/repositories/${snakeName}_repository.dart';
 
 part '${snakeName}_event.dart';
 part '${snakeName}_state.dart';
@@ -274,7 +293,11 @@ class ${pascalName}Bloc extends Bloc<${pascalName}Event, ${pascalName}State> {
 ''';
   }
 
-  static String _generateChangeNotifier(String name) {
+  static String _generateChangeNotifier(
+    String name,
+    String projectName,
+    String featureSnake,
+  ) {
     final pascalName = StringUtils.toPascalCase(name);
     final snakeName = StringUtils.toSnakeCase(name);
     final camelName = StringUtils.toCamelCase(name);
@@ -283,8 +306,8 @@ class ${pascalName}Bloc extends Bloc<${pascalName}Event, ${pascalName}State> {
     return '''
 import 'package:flutter/foundation.dart';
 
-import '../../domain/entities/${snakeName}_entity.dart';
-import '../../domain/repositories/${snakeName}_repository.dart';
+import 'package:$projectName/features/$featureSnake/domain/entities/${snakeName}_entity.dart';
+import 'package:$projectName/features/$featureSnake/domain/repositories/${snakeName}_repository.dart';
 
 /// ChangeNotifier for managing $pascalName state.
 class ${pascalName}Provider extends ChangeNotifier {
@@ -437,57 +460,41 @@ class ${pascalName}Provider extends ChangeNotifier {
 ''';
   }
 
-  /// Generates the state class for Riverpod.
-  static String generateState(String featureName, {String? entityName}) {
+  /// Generates the state class for Riverpod using Freezed.
+  static String generateState(
+    String featureName,
+    FcliConfig config, {
+    String? entityName,
+  }) {
     final name = entityName ?? featureName;
     final pascalName = StringUtils.toPascalCase(name);
     final snakeName = StringUtils.toSnakeCase(name);
+    final featureSnake = StringUtils.toSnakeCase(featureName);
     final camelName = StringUtils.toCamelCase(name);
     final pluralCamel = StringUtils.toPlural(camelName);
+    final projectName = config.projectName;
 
     return '''
-import 'package:equatable/equatable.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../domain/entities/${snakeName}_entity.dart';
+import 'package:$projectName/features/$featureSnake/domain/entities/${snakeName}_entity.dart';
 
-/// Status of $pascalName operations.
-enum ${pascalName}Status { initial, loading, loaded, error }
+part '${snakeName}_state.freezed.dart';
 
 /// State for $pascalName.
-class ${pascalName}State extends Equatable {
-  const ${pascalName}State({
-    this.status = ${pascalName}Status.initial,
-    this.$pluralCamel = const [],
-    this.selected$pascalName,
-    this.errorMessage,
-  });
-
-  const ${pascalName}State.initial() : this();
-
-  final ${pascalName}Status status;
-  final List<${pascalName}Entity> $pluralCamel;
-  final ${pascalName}Entity? selected$pascalName;
-  final String? errorMessage;
-
-  bool get isLoading => status == ${pascalName}Status.loading;
-  bool get isLoaded => status == ${pascalName}Status.loaded;
-  bool get hasError => status == ${pascalName}Status.error;
-
-  ${pascalName}State copyWith({
-    ${pascalName}Status? status,
-    List<${pascalName}Entity>? $pluralCamel,
+@freezed
+sealed class ${pascalName}State with _\$${pascalName}State {
+  const factory ${pascalName}State({
+    @Default([]) List<${pascalName}Entity> $pluralCamel,
     ${pascalName}Entity? selected$pascalName,
+    @Default(false) bool isLoading,
     String? errorMessage,
-  }) =>
-      ${pascalName}State(
-        status: status ?? this.status,
-        $pluralCamel: $pluralCamel ?? this.$pluralCamel,
-        selected$pascalName: selected$pascalName ?? this.selected$pascalName,
-        errorMessage: errorMessage,
-      );
+  }) = _${pascalName}State;
 
-  @override
-  List<Object?> get props => [status, $pluralCamel, selected$pascalName, errorMessage];
+  const ${pascalName}State._();
+
+  bool get hasError => errorMessage != null;
+  bool get isEmpty => $pluralCamel.isEmpty;
 }
 ''';
   }
